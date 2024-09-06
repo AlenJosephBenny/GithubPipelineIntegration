@@ -1,68 +1,38 @@
 pipeline {
     agent any
-    
-    environment {
-        DIRECTORY_PATH = "/project_directory"
-        TEST_ENV = "Test Env"
-        PROD_ENV = "Prod Env"
-    }
-    
+
     stages {
         stage('Build') {
             steps {
-                echo "Fetching the source code from the directory path specified by the environment variable: ${DIRECTORY_PATH}"
-                echo "Compiling the code and generating necessary artifacts"
+                echo "Starting the build stage..."
+                // Example command
+                sh 'echo "Building the project..."'
             }
         }
 
-        stage('Unit and Integration Test') {
+        stage('Test') {
             steps {
-                echo "Running unit tests..."
-                echo "Running integration tests..."
+                echo "Starting the test stage..."
+                // Example test commands
+                sh 'echo "Running unit tests..."'
             }
         }
 
-        stage('Code Analysis') {
-            steps {
-                echo "Checking the quality of the code using SonarQube"
-            }
-        }
-
-        stage('Security Scan') {
-            steps {
-                echo "Performing security scan using OWASP Dependency-Check plugin for vulnerabilities"
-            }
-        }
-        
         stage('Deploy') {
             steps {
-                echo "Deploying the application to a testing/staging environment in an AWS EC2 instance"
-                echo "Test environment: ${TEST_ENV}"
-            }
-        }
-
-        stage('Integration Tests on Staging') {
-            steps {
-                echo "Running integration tests on the staging environment"
-            }
-        }
-
-        stage('Deploy to Production') {
-            steps {
-                echo "Deploying to production environment: ${PROD_ENV}"
+                echo "Starting the deployment stage..."
+                // Example deployment command
+                sh 'echo "Deploying to production..."'
             }
         }
     }
 
     post {
         always {
-            emailext (
-                subject: "Build ${env.BUILD_NUMBER} - ${currentBuild.result}",
-                body: """<p>Build '${env.JOB_NAME} [${env.BUILD_NUMBER}]' has completed.</p>
-                         <p>Check the <a href='${env.BUILD_URL}console'>console output</a> for details.</p>""",
-                to: "alenjbenny24deakin@gmail.com",
-                attachLog: true
-            )
+            script {
+                def consoleLog = currentBuild.rawBuild.getLog(100).join('\n')
+                echo "Last 100 lines of console log:\n${consoleLog}"
+            }
         }
     }
 }
